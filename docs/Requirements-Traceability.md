@@ -1,8 +1,8 @@
 # Requirements Traceability — Escape Protocol: The Last Exit
 
-Version 2.0 (Module 00 Final Revision) — **DRAFT, awaiting student review**.
+Version 2.1 — updated after Module 02 on 2026-11-22. Rows not listed in §10 are unchanged from Version 2.0 (Module 00 Final Revision).
 
-**Status values:** `PLANNED` · `IN PROGRESS` · `VERIFIED` · `BLOCKED`.
+**Status values:** `PLANNED` · `IN PROGRESS` · `VERIFIED` · `BLOCKED`. `IN PROGRESS` means part of the evidence exists and was run, and the rest is still planned.
 **Rule:** nothing is `VERIFIED` until the implementation exists *and* its test/demonstration has actually been run with evidence recorded in `docs/Testing.md` or `docs/Development-Log.md`. At Module 00 every implementation row is `PLANNED`. Class/test names below are *planned names* and may be refined in Module 01.
 
 IDs match `docs/SRS.md`. Module numbers match `docs/Development-Plan.md`.
@@ -18,13 +18,13 @@ Source: `Assignment - 2.pdf`.
 | AR-01 | Analyze the problem and identify its computing challenges | Proposal §3 (CC-1…CC-9) | M00 | PLANNED |
 | AR-02 | Prepare a detailed project proposal and SRS | `docs/Proposal.md`, `docs/SRS.md` | M00 | PLANNED |
 | AR-03 | Design architecture, database and UML diagrams | `docs/Architecture.md`, `docs/Design.md`, ER diagram (SRS §12 → M01), UML set (§7 below) | M01 | PLANNED |
-| AR-04 | Develop a functional application using Java and appropriate tools | Maven project, Swing game, JAR | M02–M07 | PLANNED |
+| AR-04 | Develop a functional application using Java and appropriate tools | Maven project, Swing game, JAR (**M02:** Maven project, Swing window and JAR exist; placeholder only, no game yet) | M02–M07 | IN PROGRESS |
 | AR-05 | Implement required modules and demonstrate the relevant course concepts | Concept table (§2) | M03–M10 | PLANNED |
 | AR-06 | Apply suitable data structures, algorithms, OOP and design principles | `docs/Design.md` data-structure table; packages/interfaces | M01, M03–M10 | PLANNED |
 | AR-07 | Handle concurrent requests and ensure thread safety | Leaderboard server, timer, locks, concurrency tests | M07, M09 | PLANNED |
-| AR-08 | Comprehensive software testing and debugging | JUnit suites, manual playthroughs, debugging log | M11 (all modules) | PLANNED |
+| AR-08 | Comprehensive software testing and debugging | JUnit suites, manual playthroughs, debugging log (**M02:** 5 JUnit tests pass, `MainTest` 3 and `SmokeGrammarTest` 2; no game tests yet) | M11 (all modules) | IN PROGRESS |
 | AR-09 | Maintain source code using Git and GitHub | Commit history, branches, per-member commits | All | PLANNED |
-| AR-10 | Deploy the application and prepare complete technical documentation | Runnable JAR, README, docs set | M12, M13 | PLANNED |
+| AR-10 | Deploy the application and prepare complete technical documentation | Runnable JAR, README, docs set (**M02:** starter `README.md`; JAR packaged and launched, placeholder window only) | M12, M13 | IN PROGRESS |
 
 **Important requirements from the PDF**
 
@@ -43,9 +43,9 @@ Source: `Assignment - 2.pdf`.
 
 | ID | Exact concept name | Planned module / class | Planned implementation evidence | Planned test or demonstration | Status |
 |---|---|---|---|---|---|
-| C-01 | Static Checking | `pom.xml` (M02); whole code base | `--release 21`, `-Xlint:all`, strong typing, generics, `Optional`, `final`; optional extra static analysis tool only if it works on the installed JDK | Demo `docs/Static-Checking-Demo.md`: deliberately introduce a type error, record the compiler message; clean `-Xlint:all` build log | PLANNED |
-| C-02 | Basic Java | All packages | Classes, objects, control flow, collections, exceptions throughout | Code review; whole test suite | PLANNED |
-| C-03 | Testing | `src/test/java` | JUnit 5 unit + integration tests (§6) | `mvn clean test` output in `docs/Testing.md` | PLANNED |
+| C-01 | Static Checking | `pom.xml` (M02); whole code base | `--release 21`, `-Xlint:all`, strong typing, generics, `Optional`, `final`; optional extra static analysis tool only if it works on the installed JDK | Demo `docs/Static-Checking-Demo.md`: deliberately introduce a type error, record the compiler message; clean `-Xlint:all` build log **M02:** `--release 21` and `-Xlint:all` configured; builds succeeded. Lint review and demo document pending. | IN PROGRESS |
+| C-02 | Basic Java | All packages | Classes, objects, control flow, collections, exceptions throughout | Code review; whole test suite **M02:** `Main` class only. | IN PROGRESS |
+| C-03 | Testing | `src/test/java` | JUnit 5 unit + integration tests (§6) | `mvn clean test` output in `docs/Testing.md` **M02:** 5 JUnit 5 tests pass; no game tests yet. | IN PROGRESS |
 | C-04 | Code Review | `docs/Code-Review-Log.md` (+ checklist) | Cross-member reviews per module; issues and fixes recorded | Review log entries with reviewer ≠ author | PLANNED |
 | C-05 | Version Control | Git/GitHub | Meaningful commits per module, branches where useful, all members commit | `git log`, GitHub history screenshot | PLANNED |
 | C-06 | Specifications | Javadoc on `game`, `puzzles`, `inventory`, `networking` | Preconditions/postconditions/`@throws` on public methods | Tests derived from specs (`GameEngineTest`, `PuzzleContractTest`) | PLANNED |
@@ -60,13 +60,13 @@ Source: `Assignment - 2.pdf`.
 | C-15 | Equality | `inventory.Item`, `ScoreEntry`, `Expr` | Correct `equals`/`hashCode`/`toString`; behaviour in `Set`/`Map` | `ItemEqualityTest` (reflexive, symmetric, transitive, hash contract, HashSet behaviour) | PLANNED |
 | C-16 | Recursive Data Types | `lang.Expr` AST (Has/Solved/And/Or/Not); `clues.ClueNode` | Immutable recursive types with structural recursion | `ExprStructureTest`, `ClueTreeTest` | PLANNED |
 | C-17 | Regular Expressions and Grammars | `util.Validators` (regex); `Escape.g4` (grammar) | Regex for name, year, code, final answer, protocol; written grammar for ERL | `ValidatorsTest`; grammar documented in `docs/Design.md` | PLANNED |
-| C-18 | Parser Generators | `src/main/antlr4/.../Escape.g4`, build plugin | ANTLR 4 generates lexer/parser during `mvn` build; visitor builds AST (**separate from regex**) | `RuleParserTest`; demo of generated sources in `target/generated-sources` | PLANNED |
+| C-18 | Parser Generators | `src/main/antlr4/.../Escape.g4`, build plugin | ANTLR 4 generates lexer/parser during `mvn` build; visitor builds AST (**separate from regex**) | `RuleParserTest`; demo of generated sources in `target/generated-sources` **M02:** ANTLR plugin and runtime configured; `Smoke.g4` generated and compiled; `SmokeGrammarTest` 2/2 pass. `Escape.g4` not yet written (M10). | IN PROGRESS |
 | C-19 | Concurrency | `concurrency.GameTimer`, `networking.LeaderboardServer` | Scheduled executor ticking; thread pool for clients | Timer tests; multi-client test | PLANNED |
 | C-20 | Thread Safety | `GameSession`, `Leaderboard`, server | Shared data identified (session state, leaderboard map/list, queue) each with a documented guard (lock/atomic/confinement) | `SessionRaceTest`, `LeaderboardConcurrencyTest` (20+ threads) | PLANNED |
 | C-21 | Sockets and Networking | `networking.LeaderboardServer`, `LeaderboardClient` | Real TCP server/client, text protocol | `SocketIntegrationTest` (real localhost sockets) | PLANNED |
 | C-22 | Queues and Message-Passing | `networking.RequestQueue` (`BlockingQueue`) | Producer–consumer: handlers enqueue, worker consumes | `RequestQueueTest`, ordering under load | PLANNED |
 | C-23 | Locks and Synchronization | `Leaderboard` (`ReadWriteLock`), `GameSession` (`ReentrantLock`) | Explicit locks with documented order, no I/O under lock | Stress tests + code review of lock use | PLANNED |
-| C-24 | Graphical User Interfaces | `ui` package | Swing screens, EDT discipline | Manual playthrough checklists MT-UI-xx | PLANNED |
+| C-24 | Graphical User Interfaces | `ui` package | Swing screens, EDT discipline | Manual playthrough checklists MT-UI-xx **M02:** basic Swing window via `SwingUtilities.invokeLater`; no game screens yet. | IN PROGRESS |
 | C-25 | Map, Filter, Reduce | `game.GameStats`, `inventory` views, leaderboard stats | Streams on real game data (FR-AD-02) | `GameStatsTest` | PLANNED |
 | C-26 | Little Languages | Escape Rule Language (ERL), `rules/game.erl` | DSL for unlock rules, parsed by ANTLR, evaluated by engine | `RuleParserTest`, `UnlockRuleIntegrationTest`; live demo editing a rule | PLANNED |
 
@@ -148,7 +148,7 @@ Source: `Assignment - 2.pdf`.
 | FR-LB-12 | M09 | `ui.VictoryPanel` | MT-UI-17, `ClientTimeoutTest` | PLANNED |
 | FR-LB-13 | M09 | `LeaderboardServer` | MT-NET-01 (console log check) | PLANNED |
 | FR-LL-01 | M10 | `Escape.g4`, `rules/game.erl` | `RuleParserTest` | PLANNED |
-| FR-LL-02 | M10 | `pom.xml` ANTLR plugin | Build produces generated parser | PLANNED |
+| FR-LL-02 | M10 | `pom.xml` ANTLR plugin | Build produces generated parser **M02:** parser generated from smoke grammar `Smoke.g4`; `Escape.g4` pending (M10). | IN PROGRESS |
 | FR-LL-03 | M10 | `lang.Expr`, `lang.AstBuilder` | `ExprStructureTest` | PLANNED |
 | FR-LL-04 | M10 | `lang.ExprEvaluator` | `ExprEvaluatorTest` | PLANNED |
 | FR-LL-05 | M10 | `lang.RuleLoader` | `RuleSyntaxErrorTest` | PLANNED |
@@ -172,11 +172,11 @@ Source: `Assignment - 2.pdf`.
 | NFR-US-02 | M11 | MT-PLAY-01 playthrough with hints | PLANNED |
 | NFR-MT-01 | M01/M11 | Package review; import check in code review | PLANNED |
 | NFR-MT-02 | M03–M10 | Javadoc review checklist | PLANNED |
-| NFR-MT-03 | M02/M11 | `mvn clean compile` log with `-Xlint:all` | PLANNED |
-| NFR-TS-01 | M02 onward | `mvn clean test` log | PLANNED |
+| NFR-MT-03 | M02/M11 | `mvn clean compile` log with `-Xlint:all` **M02:** `-Xlint:all` configured; build succeeded; warning review pending. | IN PROGRESS |
+| NFR-TS-01 | M02 onward | `mvn clean test` log **M02:** `mvn clean test` BUILD SUCCESS, 5 tests (student-reported). | IN PROGRESS |
 | NFR-TS-02 | M11 | Coverage report if a tool is added | PLANNED |
 | NFR-PT-01 | M13 | MT-DEP-01 | PLANNED |
-| NFR-DP-01 | M13 | `mvn clean package` output | PLANNED |
+| NFR-DP-01 | M13 | `mvn clean package` output **M02:** `mvn clean package` succeeded; JAR launched. | IN PROGRESS |
 | NFR-VC-01 | All | `git log` | PLANNED |
 | NFR-DC-01 | M12 | Docs checklist | PLANNED |
 | CON-01 | M07/M09 | Javadoc guard notes; review | PLANNED |
@@ -210,8 +210,8 @@ Source: `Assignment - 2.pdf`.
 | D-07 | Test suite + testing report | `src/test/java`, `docs/Testing.md` | M11 | PLANNED |
 | D-08 | Code-review log and debugging log | `docs/Code-Review-Log.md`, `docs/Development-Log.md` | M11 | PLANNED |
 | D-09 | Concept mapping with evidence | `docs/SCD-Concept-Mapping.md`, this file | M12 | PLANNED |
-| D-10 | README, user/developer guide, limitations | `README.md`, `docs/Limitations.md` | M12 | PLANNED |
-| D-11 | Runnable JAR + launch instructions | `target/`, README | M13 | PLANNED |
+| D-10 | README, user/developer guide, limitations | `README.md`, `docs/Limitations.md` (**M02:** starter `README.md` only) | M12 | IN PROGRESS |
+| D-11 | Runnable JAR + launch instructions | `target/`, README (**M02:** placeholder JAR built and launched) | M13 | IN PROGRESS |
 | D-12 | Live demo script, viva Q&A, per-member checklist | `docs/Demo-and-Viva.md` | M13 | PLANNED |
 
 ---
@@ -220,6 +220,8 @@ Source: `Assignment - 2.pdf`.
 
 **Automated (JUnit 5)** — all `PLANNED`:
 `ValidatorsTest`, `RoomOrderTest`, `InventoryTest`, `InventoryRepInvariantTest`, `ItemEqualityTest`, `ItemImmutabilityTest`, `GameEngineTest`, `GameStateTransitionTest`, `ProgressionTest`, `ResubmitTest`, `PenaltyRulesTest`, `ScoreCalculatorTest`, `HintServiceTest`, `PuzzleContractTest`, `OfficePuzzleTest`, `LibraryPuzzleTest`, `SequencePuzzleTest`, `SymbolPuzzleTest`, `FinalExitPuzzleTest`, `GameTimerTest`, `PauseResumeTest`, `SessionRaceTest`, `SaveLoadTest`, `CorruptSaveTest`, `TamperedSaveTest`, `LeaderboardPersistenceTest`, `LeaderboardTest`, `LeaderboardConcurrencyTest`, `RequestQueueTest`, `ProtocolTest`, `MalformedRequestTest`, `SocketIntegrationTest`, `MultiClientTest`, `ClientTimeoutTest`, `DisconnectTest`, `ServerShutdownTest`, `ExprStructureTest`, `ExprEvaluatorTest`, `RuleParserTest`, `RuleSyntaxErrorTest`, `UnlockRuleIntegrationTest`, `ClueTreeTest`, `GameStatsTest`, plus regression tests per logged defect.
+
+**Executed in Module 02 (student-reported, all passed):** `MainTest` (3 tests) and `SmokeGrammarTest` (2 tests), 5 tests in total, 0 failures, 0 errors, 0 skipped. These two classes are not part of the planned catalogue above; they verify the build set-up only. Every test in the planned catalogue remains `PLANNED`.
 
 **Manual** — checklists `MT-UI-01…20`, `MT-TIM-01`, `MT-NET-01`, `MT-PLAY-01` (full playthrough), `MT-PLAY-02` (timeout), `MT-DEP-01` (JAR launch). Results are recorded only after execution.
 
@@ -246,7 +248,7 @@ Source: `Assignment - 2.pdf`.
 
 | ID | Package | Purpose | Concepts | Status |
 |---|---|---|---|---|
-| S-01 | `app` | Entry points (`Main`, `ServerMain`) | C-02, C-24 | PLANNED |
+| S-01 | `app` | Entry points (`Main`, `ServerMain`) (**M02:** `Main` only; `ServerMain` pending) | C-02, C-24 | IN PROGRESS |
 | S-02 | `game` | Engine, session, state, score, hints, unlock rules, stats | C-06, C-07, C-09, C-14, C-20, C-25 | PLANNED |
 | S-03 | `player` | Player name/profile | C-08, C-17 | PLANNED |
 | S-04 | `rooms` | Room ids and definitions | C-02 | PLANNED |
@@ -262,6 +264,8 @@ Source: `Assignment - 2.pdf`.
 
 ---
 
+> **Module 02 note:** only the `app` package contains a class (`Main`). The other `com.escapeprotocol` packages exist as placeholders (`package-info.java`), and the `lang` package folder also holds the smoke-test grammar `Smoke.g4` (under `src/main/antlr4`). No package other than `app` is marked `IN PROGRESS`.
+
 ## 9. Presentation / Viva Evidence
 
 | ID | Evidence | Owner | Status |
@@ -273,3 +277,23 @@ Source: `Assignment - 2.pdf`.
 | V-05 | Git history walkthrough showing each member's commits | all | PLANNED |
 | V-06 | Per-member contribution statement + ability to explain any class | each member | PLANNED |
 | V-07 | Viva Q&A preparation sheet (concept questions, "why did you design it this way") | all | PLANNED |
+
+---
+
+## 10. Module 02 Update Record (2026-11-22)
+
+Evidence is recorded in `docs/Development-Log.md` §5a and §7a (student-reported results).
+
+| Row | Previous status | New status | Why |
+|---|---|---|---|
+| AR-04, AR-08, AR-10 | PLANNED | IN PROGRESS | Maven project, JUnit run and JAR packaging exist; the game itself and comprehensive tests do not |
+| C-01 Static Checking | PLANNED | IN PROGRESS | `-Xlint:all` and `--release 21` configured; lint review and demo pending |
+| C-02 Basic Java | PLANNED | IN PROGRESS | `Main` class only |
+| C-03 Testing | PLANNED | IN PROGRESS | 5 passing tests; no game-logic tests |
+| C-18 Parser Generators | PLANNED | IN PROGRESS | ANTLR generation verified with a smoke grammar; real grammar pending |
+| C-24 Graphical User Interfaces | PLANNED | IN PROGRESS | Basic window only |
+| FR-LL-02 | PLANNED | IN PROGRESS | Generation verified for `Smoke.g4`, not `Escape.g4` |
+| NFR-MT-03, NFR-TS-01, NFR-DP-01 | PLANNED | IN PROGRESS | Build, test and package succeeded once; they must be repeated through M11/M13 |
+| D-10, D-11, S-01 | PLANNED | IN PROGRESS | Starter README, placeholder JAR, `Main` only |
+
+**No row is `VERIFIED` after Module 02.** The other 21 concepts, all other FR/NFR/CON/ERR/SEC/DEP rows, all deliverables not listed above, all planned tests and all Module 03+ work remain `PLANNED`. C-05 (Version Control) and SEC-03 are unchanged because Module 02 is not yet committed.
