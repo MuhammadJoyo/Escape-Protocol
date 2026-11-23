@@ -1,6 +1,6 @@
 # Development Plan — Escape Protocol: The Last Exit
 
-Version 2.1 (Module 03 Planning Update) — **DRAFT, awaiting student review**.
+Version 2.2 (Module 04 Update) — **DRAFT, awaiting student review**.
 
 The deadline extension is granted but the **new date is not known** (Q-01). This plan therefore uses *relative effort* (percent of total effort and ordered checkpoints), not calendar dates. Once the date is confirmed, convert the percentages into dates and record them in `docs/Development-Log.md`.
 
@@ -97,21 +97,36 @@ Class names are defined by the architecture and design documents. Base package `
   - `ItemImmutabilityTest`
   - `GameStateTransitionTest`
 
-- **Verification evidence:** `mvn clean test` completed successfully with 59 tests, 0 failures, 0 errors, and 0 skipped tests. `mvn clean package` also completed successfully and generated `target/escape-protocol.jar`.
+- **Verification evidence:** `mvn clean test` completed successfully with 64 tests (the 59 Module 03 tests plus the 5 earlier Module 02 tests), 0 failures, 0 errors, and 0 skipped tests (student-reported; an earlier version of this line said 59). `mvn clean package` also completed successfully and generated `target/escape-protocol.jar`.
 - **Concepts:** C-08, C-09, C-12, C-13, C-15.
 - **Checkpoint:** after documentation review, Git status and diff checks, commit `feat: implement domain model and inventory ADT`.
 
 ### M04 — Game Engine and Progression
 
-- **Planned files:** `game/GameSession`, `game/GameEngine`, `game/UnlockRule` (+ hard-coded implementation), `game/ScoreCalculator`, `game/HintService`.
-- **Specs first:** write Javadoc contracts and spec-to-test table before code.
-- **Tests:** `GameEngineTest`, `GameStateTransitionTest`, `ProgressionTest`, `ScoreCalculatorTest`, `HintServiceTest`.
-- **Concepts:** C-06, C-07, C-14, C-20 (session guard design).
-- **Checkpoint:** commit `feat: implement core game engine`.
+- **Status:** **Implemented; all four parts delivered.** Local Maven results are student-reported through Part 3 (170 tests passed). Part 4 (`GameEngine`, `GameEngineTest`) is awaiting local verification. Module 04 is not committed yet.
+- **Implemented main files:**
+  - `game/GameEngine.java`
+  - `game/GameSession.java`
+  - `game/SessionSnapshot.java`
+  - `game/GameCatalog.java`
+  - `game/UnlockRule.java`, `game/UnlockContext.java`, `game/HardCodedUnlockRule.java`
+  - `game/ScoreCalculator.java`, `game/HintService.java`
+  - `game/GameListener.java`, `game/SubmissionResult.java`, `game/HintResult.java`
+  - `puzzles/Puzzle.java`, `puzzles/PuzzleResult.java` (contract only, decision D1; the real puzzles are Module 05)
+- **Specs first:** Javadoc contracts (preconditions, postconditions, exceptions, abstraction function, representation invariant and lock guard) were written together with the code for the public classes.
+- **Implemented tests:**
+  - `GameEngineTest`, `GameSessionTest`, `ProgressionTest`, `ScoreCalculatorTest`, `HintServiceTest`
+  - `GameCatalogTest`, `UnlockContextTest`, `ResultTypesTest`, `PuzzleResultTest`
+  - test-only helper `FakePuzzle` (not part of the game)
+  - `GameStateTransitionTest` already exists from Module 03.
+- **Verification evidence (student-reported):** after Part 1, 99 tests; after Part 2, 130 tests; after Part 3, 170 tests, with 0 failures, 0 errors and 0 skipped, and `mvn clean package` BUILD SUCCESS. Part 4 adds 29 `GameEngineTest` tests; the expected total is 199, which is **not yet verified locally**.
+- **Concepts:** C-03, C-06, C-07, C-08, C-09, C-12, C-13, C-14, C-20 (statuses in `docs/Requirements-Traceability.md`; the timer and concurrency design of C-19 belong to M07).
+- **Checkpoint:** after Part 4 is verified locally and `git status`/`git diff` are checked, commit `feat: implement core game engine`. Not committed yet.
 
 ### M05 — Puzzle System
 
 - **Planned files:** `puzzles/Puzzle`, `PuzzleResult`, `OfficePuzzle`, `LibraryPuzzle`, `SequencePuzzle`, `SymbolPuzzle` (P2), `FinalExitPuzzle`, `util/Validators`.
+- **Note:** `Puzzle` and `PuzzleResult` already exist (Module 04, decision D1), and `util/Validators` already exists with the player-name rule (Module 03). Module 05 adds the puzzle implementations and the puzzle validators, and uses the approved ids `office_year`, `library_order`, `lab_sequence`, `final_exit`.
 - **Tests:** one test class per puzzle, `PuzzleContractTest`, `ResubmitTest`, `PenaltyRulesTest`.
 - **Concepts:** C-14, C-17 (regex), C-08.
 - **Checkpoint:** commit `feat: implement puzzle system`.

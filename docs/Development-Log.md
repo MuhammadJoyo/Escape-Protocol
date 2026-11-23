@@ -47,6 +47,9 @@ This log records only facts that have actually happened or been reported by the 
 | DEC-09 | `com.escapeprotocol.player.Player` is the implementation class for the player name (not `PlayerName`), because committed `Architecture.md` and `Design.md` say `Player`. Only one class is created | Module 03 | Student instruction. The M03 entry in `Development-Plan.md` must be corrected by the student |
 | DEC-10 | `RoomId` order indexes are numbered 1 to 4 (OFFICE = 1 … FINAL_EXIT = 4) | Module 03 | **Assumption** made while writing the code; `Architecture.md`/`Design.md` were not visible to the code generator. Verify against `Design.md` (see OI-05) |
 | DEC-11 | Other Module 03 assumptions: `ItemKind` is a separate enum file in `inventory`; `Room` accepts an empty puzzle list; `Player` equality is case-sensitive; invalid player names throw `IllegalArgumentException`, null constructor arguments of `Item`/`Room` throw `NullPointerException` | Module 03 | **Assumptions**; verify against `Design.md` (see OI-05) |
+| DEC-12 | Module 04 decisions D1–D8 approved by the student: D1 only `Puzzle` and `PuzzleResult` are added in M04 (puzzle implementations stay in M05; tests use the test-only `FakePuzzle`); D2 ids `office_year`, `library_order`, `lab_sequence`, `final_exit`, `office_key`, `code_7394`, `lab_clue_30`; D3 `Room` unchanged, `GameCatalog` owns the completion rewards; D4 remaining seconds are injected as an `IntSupplier`; D5 a new hint on a solved puzzle is REFUSED without penalty; D6 an unknown puzzle id throws `IllegalArgumentException`; D7 `GameSession.expire()` is implemented now; D8 `HardCodedUnlockRule` is item-based | Module 04 | Approved by the student |
+| DEC-13 | `GameEngine` follows Design §6: `newGame(name)` creates and starts a fresh session, so there is no separate public `start()`; `restart()` reuses the last player and always creates a new session; the engine has no lock (atomic fields only; the session lock guards all game state); `shutdown()` drops the session and refuses later operations; the listener is passed to each session, which notifies it after releasing its lock | Module 04 | Implemented; the brief's separate `start()` was not added because the design has none |
+| DEC-14 | Names and descriptions of the three reward items were written in Module 04 Part 2 because the SRS fixes none; each description contains the value needed for the final answer (2004, 7394, 30) | Module 04 | Editable text in `GameCatalog.standardCompletionItems()` |
 
 ## 4. Module 00 Revision History
 
@@ -57,6 +60,7 @@ This log records only facts that have actually happened or been reported by the 
 | 2.1 | Targeted correction of `Development-Plan.md` and `Development-Log.md` only. Plan: removed duplicated/concatenated M02/M03 content (reported in the student's copy), each of M00–M13 appears once in the roadmap and once in the module details, roadmap "Class" column added, M09 and M10 stated as required deliverables, dependency diagram checked against roadmap, effort shares total 100 %. Log: setup and Git facts updated. | The other three files were not changed. The corrected files must replace the staged versions and be re-staged. |
 | 3 | Module 02 completion update (2026-11-22): §1, §2 note, §3 (DEC-07), §5, new §5a, §7 (Q-04, OI-03, OI-04), §7a, §8, §9 | Only the listed sections changed; all other content is unchanged |
 | 4 | Module 03 start update (2026-11-22): §3 (DEC-09 to DEC-11), §5, new §5b, §7 (OI-05), §7a, §8, §9 | Module 03 is recorded as in progress only; the Module 02 Git facts were updated from the student's report |
+| 5 | Module 04 completion update (2026-11-23): §3 (DEC-12 to DEC-14), §5 and §5b (Module 03 recorded as completed), new §5c, §7 (OI-05 to OI-07), §7a, §8, §9 | Module 04 is recorded as implemented with local verification pending for Part 4 only |
 
 Corrections/omissions addressed in Rev 2 (per brief): socket leaderboard retained with queue/lock/multi-client requirements; database design with ER diagram and instructor-confirmation item; all 26 concepts and all 10 requirements traced; parser generator separated from regex; little language defined; group placeholders; no invented dates, names, results or approvals.
 
@@ -67,10 +71,11 @@ Corrections/omissions addressed in Rev 2 (per brief): socket leaderboard retaine
 | M00 Requirements, Proposal, SRS | Completed, committed and pushed (student-reported in the Module 03 brief). Commit hash not recorded here. |
 | M01 Architecture and Design | Completed, committed and pushed (student-reported in the Module 03 brief). `docs/Architecture.md` and `docs/Design.md` exist. Commit hash not recorded here. |
 | M02 Maven Project Foundation | **Completed and verified by the student on 2026-11-22** (see §5a). Committed and pushed as `1210f63` (student-reported). |
-| M03 Domain Model and ADTs | **In progress** (see §5b). Source and tests delivered; not yet run by the student; not complete; not committed. |
-| M04–M13 | Not started (planned) |
+| M03 Domain Model and ADTs | **Completed** (see §5b). 64 tests passed locally; committed and pushed (student-reported). |
+| M04 Game Engine and Progression | **Implemented, Part 4 verification pending** (see §5c). Parts 1–3 verified locally (170 tests); Part 4 delivered, not yet run; not committed. |
+| M05–M13 | Not started (planned) |
 
-Concept rows in `docs/Requirements-Traceability.md`: none `VERIFIED`. After Module 02, C-01, C-02, C-03, C-18 and C-24 are `IN PROGRESS`; the other 21 concepts remain `PLANNED`.
+Concept rows in `docs/Requirements-Traceability.md`: none `VERIFIED`. After Module 04, 16 concepts are `IN PROGRESS` (C-01, C-02, C-03, C-05, C-06, C-07, C-08, C-09, C-12, C-13, C-14, C-15, C-18, C-19, C-20, C-24) and 10 remain `PLANNED` (C-04, C-10, C-11, C-16, C-17, C-21, C-22, C-23, C-25, C-26).
 
 ## 5a. Module 02 Completion Entry — 2026-11-22
 
@@ -108,21 +113,49 @@ Concept rows in `docs/Requirements-Traceability.md`: none `VERIFIED`. After Modu
 
 **Git:** Module 02 was committed as `1210f63` and pushed (student-reported).
 
-## 5b. Module 03 — Domain Model and Abstract Data Types (IN PROGRESS, not complete)
+## 5b. Module 03 — Domain Model and Abstract Data Types (COMPLETED)
 
 **Objective:** Implement the basic domain classes and the Inventory ADT, with unit tests. No session, engine, puzzles, GUI, timer, networking or persistence.
 
-**Delivered to the student (not yet run by the student):**
+**Delivered:**
 - Source: `player/Player`, `util/Validators`, `rooms/RoomId`, `rooms/Room`, `inventory/Item`, `inventory/ItemKind`, `inventory/Inventory`, `game/GameState`.
 - Tests: `ValidatorsTest`, `PlayerTest`, `RoomOrderTest`, `RoomTest`, `InventoryTest`, `InventoryRepInvariantTest`, `ItemEqualityTest`, `ItemImmutabilityTest`, `GameStateTransitionTest`.
-- Naming: `Player` is used, not `PlayerName` (DEC-09). The M03 entry in `Development-Plan.md` still has to be corrected by the student.
+- Naming: `Player` is used, not `PlayerName` (DEC-09). The M03 entry in `Development-Plan.md` was corrected.
 
-**Still required before Module 03 can be marked complete:**
-- The student runs `mvn clean test` and `mvn clean package` and reports the results.
-- The student reviews the assumptions DEC-10 and DEC-11 against `Design.md`.
-- The student confirms the commit and push (planned message: `feat: implement domain model and inventory ADT`).
+**Verification (student-reported):** `mvn clean test` ran 64 tests (59 Module 03 tests plus 5 Module 02 tests) with 0 failures, 0 errors and 0 skipped; `mvn clean package` succeeded; Module 03 was committed and pushed. The commit hash is not recorded here. `RoomId` order indexes 1 to 4 (DEC-10) match the Design and SRS data model; see OI-05 for the other assumptions.
 
-No Module 03 result is recorded here as passed.
+## 5c. Module 04 — Game Engine and Progression (IMPLEMENTED; Part 4 verification pending)
+
+**Objective:** Implement the game engine, the session, scoring, hints and room progression, with unit and integration tests, without Swing, real puzzles, timer, persistence, networking or ERL.
+
+**Parts delivered**
+
+| Part | Content | Tests added | Total tests after the part (student-reported) |
+|---|---|---|---|
+| 1 | `SubmissionResult`, `HintResult`, `GameListener`, `UnlockContext`, `UnlockRule`, `ScoreCalculator`, `HintService` | 35 | 99 |
+| 2 | `Puzzle`, `PuzzleResult`, `HardCodedUnlockRule`, `GameCatalog`, `FakePuzzle` (test helper) | 31 | 130 |
+| 3 | `SessionSnapshot`, `GameSession` | 40 | 170 |
+| 4 | `GameEngine` | 29 | 199 expected, **not yet verified** |
+
+**Implementation summary**
+- **GameSession and GameEngine:** `GameSession` owns the player, state, score, inventory, solved puzzles, unlocked rooms and revealed hints. `GameEngine` is the facade: it looks puzzles up in `GameCatalog` and delegates every operation to the session. It does not duplicate scoring, hint costs, progression, unlocking or state transitions (DEC-13).
+- **SessionSnapshot immutability:** a record whose collections are copied and unmodifiable; it holds no reference to the session.
+- **Puzzle abstraction and catalog:** `Puzzle` and `PuzzleResult` are the contract only; `GameCatalog` holds the rooms, the reward items and the supplied puzzles and contains no puzzle implementation. Tests use the test-only `FakePuzzle`.
+- **Scoring and hints:** score 1000; wrong valid answer −25; new hint −50; floor at 0; invalid format and re-viewing a hint cost nothing; victory adds 2 points per remaining second using `long` arithmetic capped at `Integer.MAX_VALUE`; at most 3 hints per puzzle.
+- **State transitions and progression:** the five legal transitions of `GameState`; `expire()` moves RUNNING to GAME_OVER; Library, Laboratory and Final Exit unlock when the player owns `office_key`, `code_7394` and `lab_clue_30` (`HardCodedUnlockRule`); a correct Final Exit answer with no time left ends in GAME_OVER.
+- **Locking and thread safety:** one `ReentrantLock` in `GameSession` guards all mutable session state, including the non-thread-safe `Inventory`. There is no second lock. The listener is called after the lock is released, and no I/O happens under the lock. `GameEngine` has no lock and keeps only atomic references.
+- **Tests:** 40 `GameSessionTest` tests include real multi-thread tests (concurrent wrong answers, concurrent hint requests, and a 100-round race of a final answer against `expire()`); `GameEngineTest` has 29 tests using the real session, catalog and unlock rule.
+
+**Results**
+- Parts 1–3: `mvn clean test` passed with 99, 130 and 170 tests respectively, 0 failures, 0 errors, 0 skipped; `mvn clean package` BUILD SUCCESS and the JAR was generated (student-reported).
+- Part 4: delivered, **not yet run by the student**. No result is recorded.
+
+**Remaining limitations and deferred work**
+- No timer: remaining seconds come from an injected `IntSupplier`; Module 07 supplies `GameTimer` and also stops it in restart and shutdown.
+- No real puzzles: Module 05. `GameCatalog.missingPuzzleIds()` lists puzzles not yet supplied.
+- The session's representation invariant includes "every unlocked room satisfies the unlock rule"; revisit it when ERL rules arrive in Module 10 (OI-06).
+- No code-review entry has been recorded for Module 04, no `Testing.md`, and no coverage figure has been measured.
+- Module 04 is **not committed**.
 
 ## 6. Debugging Log
 
@@ -150,7 +183,9 @@ Real defects only. Template (copy a row per defect):
 | OI-02 | Responsibility assignment (Development-Plan §5) | Open |
 | OI-03 | `.gitignore` inspected by the student (expected exclusions present); re-verify when Maven `target/` exists | Done in Module 02: student confirmed `target/` is ignored by Git (re-check before each commit) |
 | OI-04 | Verify ANTLR plugin works with installed JDK | Closed in Module 02: ANTLR 4 generation and smoke test succeeded on JDK 27 with `--release 21` (student-reported) |
-| OI-05 | Check the Module 03 assumptions (DEC-10, DEC-11) against `Design.md` and correct the code if they differ | Open (Module 03) |
+| OI-05 | Check the Module 03 assumptions (DEC-10, DEC-11) against `Design.md` and correct the code if they differ | Partly closed: `orderIndex` 1–4 matches the Design and SRS data model; the empty puzzle list, case-sensitive player equality and exception types are not specified by the Design and remain assumptions |
+| OI-06 | Revisit the `GameSession` representation-invariant clause "unlocked rooms satisfy the rule" when ERL rules (possibly using `not has(...)`) are added | Open (Module 10) |
+| OI-07 | `GameEngine.restart()` and `shutdown()` must also stop the timer once `GameTimer` exists | Open (Module 07) |
 
 ## 7a. Test Status
 
@@ -164,14 +199,24 @@ Student-reported results from Module 02 (2026-11-22):
 
 `mvn clean test` reported BUILD SUCCESS. These tests cover only the window title/messages and a smoke grammar. No game-logic tests exist yet. No coverage figure has been measured.
 
-**Module 03:** nine test classes have been written and delivered, but the student has **not yet run them**. Test status for Module 03: not run.
+**Module 03 (student-reported):** `mvn clean test` ran 64 tests (59 Module 03 + 5 Module 02), 0 failures, 0 errors, 0 skipped.
+
+**Module 04 (student-reported through Part 3):**
+
+| After | Tests run | Failures / errors / skipped | `mvn clean package` |
+|---|---|---|---|
+| Part 1 | 99 | 0 / 0 / 0 | BUILD SUCCESS |
+| Part 2 | 130 | 0 / 0 / 0 | BUILD SUCCESS |
+| Part 3 | 170 | 0 / 0 / 0 | BUILD SUCCESS |
+
+Part 4 adds 29 `GameEngineTest` tests; the expected total is 199. This has **not been run locally**, so no Part 4 result is recorded.
 
 ## 8. Git Status
 
 - Branch `main`, remote `origin` → `https://github.com/MuhammadJoyo/Escape-Protocol.git`.
-- **Module 00, Module 01 and Module 02:** committed and pushed (student-reported in the Module 03 brief). Module 02 commit: `1210f63`. Hashes of the Module 00 and 01 commits are not recorded here.
-- **Module 03:** work in progress. Nothing has been committed or pushed.
-- Planned commit message after the tests pass: `feat: implement domain model and inventory ADT`.
+- **Module 00, 01, 02 and 03:** committed and pushed (student-reported). Module 02 commit: `1210f63`. Other hashes are not recorded here.
+- **Module 04:** Parts 1–3 are in the student's working tree and verified locally (170 tests); Part 4 is delivered and not yet verified. Nothing from Module 04 is recorded as committed or pushed.
+- Planned commit message after Part 4 passes: `feat: implement core game engine`.
 
 ## 9. Log Entries
 
@@ -183,3 +228,6 @@ Student-reported results from Module 02 (2026-11-22):
 | 2026-11-22 | Module 02 completed and verified by the student: 5 tests passed, `mvn clean test` and `mvn clean package` succeeded, Swing window launched via Maven and via the JAR, ANTLR generation verified. Ready for commit, not yet committed or pushed |
 | 2026-11-22 | Module 02 committed as `1210f63` and pushed (student-reported); Modules 00 and 01 also reported as pushed |
 | 2026-11-22 | Module 03 started: source and tests delivered to the student; not yet run; `Player` chosen over `PlayerName` |
+| 2026-11-22 | Module 03 completed: 64 tests passed locally, committed and pushed (student-reported) |
+| 2026-11-23 | Module 04 decisions D1–D8 approved; Parts 1–3 delivered and verified locally by the student (99, 130 and 170 tests, all passing) |
+| 2026-11-23 | Module 04 Part 4 (`GameEngine`, `GameEngineTest`, documentation updates) delivered; local verification pending; not committed |
