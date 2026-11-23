@@ -2,7 +2,11 @@ package com.escapeprotocol.game;
 
 import com.escapeprotocol.inventory.Item;
 import com.escapeprotocol.inventory.ItemKind;
+import com.escapeprotocol.puzzles.FinalExitPuzzle;
+import com.escapeprotocol.puzzles.LibraryPuzzle;
+import com.escapeprotocol.puzzles.OfficePuzzle;
 import com.escapeprotocol.puzzles.Puzzle;
+import com.escapeprotocol.puzzles.SequencePuzzle;
 import com.escapeprotocol.rooms.Room;
 import com.escapeprotocol.rooms.RoomId;
 import java.util.Collection;
@@ -129,6 +133,19 @@ public final class GameCatalog {
      */
     public static GameCatalog standard(Collection<Puzzle> puzzles) {
         return new GameCatalog(standardRooms(), standardCompletionItems(), puzzles);
+    }
+
+    /**
+     * Creates the real game: the standard rooms and reward items with the four real puzzles
+     * ({@link OfficePuzzle}, {@link LibraryPuzzle}, {@link SequencePuzzle},
+     * {@link FinalExitPuzzle}). The result has no missing puzzles. The symbol puzzle (FR-PZ-07,
+     * P2) is deferred, so the Laboratory requires {@code lab_sequence} alone.
+     *
+     * @return a complete catalog
+     */
+    public static GameCatalog standardWithPuzzles() {
+        return standard(List.of(new OfficePuzzle(), new LibraryPuzzle(), new SequencePuzzle(),
+                new FinalExitPuzzle()));
     }
 
     /**

@@ -8,7 +8,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.escapeprotocol.inventory.Item;
 import com.escapeprotocol.inventory.ItemKind;
+import com.escapeprotocol.puzzles.FinalExitPuzzle;
+import com.escapeprotocol.puzzles.LibraryPuzzle;
+import com.escapeprotocol.puzzles.OfficePuzzle;
 import com.escapeprotocol.puzzles.Puzzle;
+import com.escapeprotocol.puzzles.SequencePuzzle;
 import com.escapeprotocol.rooms.Room;
 import com.escapeprotocol.rooms.RoomId;
 import java.util.ArrayList;
@@ -196,5 +200,81 @@ class GameCatalogTest {
         assertThrows(NullPointerException.class, () -> catalog.room(null));
         assertThrows(NullPointerException.class, () -> catalog.completionItem(null));
         assertFalse(catalog.rooms().isEmpty());
+    }
+    // ------------------------------------------------------------------ real puzzles (Module 05)
+
+    @Test
+    void standardWithPuzzlesIsCompleteAndContainsTheFourRealPuzzles() {
+        GameCatalog catalog = GameCatalog.standardWithPuzzles();
+        assertTrue(catalog.missingPuzzleIds().isEmpty());
+        assertEquals(4, catalog.puzzles().size());
+        assertTrue(catalog.puzzle("office_year").orElseThrow() instanceof OfficePuzzle);
+        assertTrue(catalog.puzzle("library_order").orElseThrow() instanceof LibraryPuzzle);
+        assertTrue(catalog.puzzle("lab_sequence").orElseThrow() instanceof SequencePuzzle);
+        assertTrue(catalog.puzzle("final_exit").orElseThrow() instanceof FinalExitPuzzle);
+    }
+
+    @Test
+    void puzzleIdConstantsOfThePuzzlesMatchTheCatalogConstants() {
+        assertEquals(GameCatalog.OFFICE_PUZZLE_ID, OfficePuzzle.ID);
+        assertEquals(GameCatalog.LIBRARY_PUZZLE_ID, LibraryPuzzle.ID);
+        assertEquals(GameCatalog.LABORATORY_PUZZLE_ID, SequencePuzzle.ID);
+        assertEquals(GameCatalog.FINAL_EXIT_PUZZLE_ID, FinalExitPuzzle.ID);
+    }
+
+    @Test
+    void everyRequiredPuzzleOfEveryRoomResolvesToAPuzzleOfThatRoom() {
+        GameCatalog catalog = GameCatalog.standardWithPuzzles();
+        for (Room room : catalog.rooms()) {
+            for (String puzzleId : room.requiredPuzzleIds()) {
+                Puzzle puzzle = catalog.puzzle(puzzleId).orElseThrow();
+                assertEquals(room.id(), puzzle.roomId(), puzzleId);
+                assertEquals(puzzleId, puzzle.id());
+            }
+        }
+    }
+
+    @Test
+    void laboratoryRequiresTheSequencePuzzleAloneBecauseTheSymbolPuzzleIsDeferred() {
+        GameCatalog catalog = GameCatalog.standardWithPuzzles();
+        assertEquals(List.of("lab_sequence"), catalog.room(RoomId.LABORATORY).requiredPuzzleIds());
+        assertEquals(4, catalog.puzzles().size());
+        assertEquals(Optional.empty(), catalog.puzzle("lab_symbols"));
+    }
+
+    @Test
+    void finalExitDeclaresExactlyTheRewardItemsOfTheOtherThreeRooms() {
+        GameCatalog catalog = GameCatalog.standardWithPuzzles();
+        Puzzle finalExit = catalog.puzzle("final_exit").orElseThrow();
+        assertEquals(java.util.Set.of(GameCatalog.OFFICE_KEY_ID, GameCatalog.LIBRARY_CODE_ID,
+                GameCatalog.LABORATORY_CLUE_ID), finalExit.requiredItemIds());
+        assertEquals(java.util.Set.of(
+                catalog.completionItem(RoomId.OFFICE).orElseThrow().id(),
+                catalog.completionItem(RoomId.LIBRARY).orElseThrow().id(),
+                catalog.completionItem(RoomId.LABORATORY).orElseThrow().id()), finalExit.requiredItemIds());
+        for (String itemId : finalExit.requiredItemIds()) {
+            assertTrue(catalog.item(itemId).isPresent(), itemId);
+        }
+    }
+
+    @Test
+    void theRealPuzzleAnswersAndTheRewardTextsAgree() {
+        GameCatalog catalog = GameCatalog.standardWithPuzzles();
+        assertTrue(catalog.completionItem(RoomId.OFFICE).orElseThrow().description()
+                .contains(OfficePuzzle.CORRECT_YEAR));
+        assertTrue(catalog.completionItem(RoomId.LIBRARY).orElseThrow().description()
+                .contains(FinalExitPuzzle.CORRECT_CODE));
+        assertTrue(catalog.completionItem(RoomId.LABORATORY).orElseThrow().description()
+                .contains(String.valueOf(SequencePuzzle.CORRECT_VALUE)));
+        assertEquals(SequencePuzzle.CORRECT_VALUE, FinalExitPuzzle.CORRECT_NUMBER);
+        assertEquals(OfficePuzzle.CORRECT_YEAR, FinalExitPuzzle.CORRECT_YEAR);
+    }
+
+    @Test
+    void eachCallToStandardWithPuzzlesGivesAnIndependentCompleteCatalog() {
+        GameCatalog first = GameCatalog.standardWithPuzzles();
+        GameCatalog second = GameCatalog.standardWithPuzzles();
+        assertTrue(first.missingPuzzleIds().isEmpty() && second.missingPuzzleIds().isEmpty());
+        assertFalse(first.puzzle("office_year").orElseThrow() == second.puzzle("office_year").orElseThrow());
     }
 }

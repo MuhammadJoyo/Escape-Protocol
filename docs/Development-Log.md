@@ -50,6 +50,10 @@ This log records only facts that have actually happened or been reported by the 
 | DEC-12 | Module 04 decisions D1–D8 approved by the student: D1 only `Puzzle` and `PuzzleResult` are added in M04 (puzzle implementations stay in M05; tests use the test-only `FakePuzzle`); D2 ids `office_year`, `library_order`, `lab_sequence`, `final_exit`, `office_key`, `code_7394`, `lab_clue_30`; D3 `Room` unchanged, `GameCatalog` owns the completion rewards; D4 remaining seconds are injected as an `IntSupplier`; D5 a new hint on a solved puzzle is REFUSED without penalty; D6 an unknown puzzle id throws `IllegalArgumentException`; D7 `GameSession.expire()` is implemented now; D8 `HardCodedUnlockRule` is item-based | Module 04 | Approved by the student |
 | DEC-13 | `GameEngine` follows Design §6: `newGame(name)` creates and starts a fresh session, so there is no separate public `start()`; `restart()` reuses the last player and always creates a new session; the engine has no lock (atomic fields only; the session lock guards all game state); `shutdown()` drops the session and refuses later operations; the listener is passed to each session, which notifies it after releasing its lock | Module 04 | Implemented; the brief's separate `start()` was not added because the design has none |
 | DEC-14 | Names and descriptions of the three reward items were written in Module 04 Part 2 because the SRS fixes none; each description contains the value needed for the final answer (2004, 7394, 30) | Module 04 | Editable text in `GameCatalog.standardCompletionItems()` |
+| DEC-15 | **SymbolPuzzle (SRS FR-PZ-07, P2) is deferred.** It is not implemented in Module 05 and not added to `GameCatalog`; the Laboratory requires only `lab_sequence`. If it is implemented later it becomes required for Laboratory completion (SRS rule). The SRS requirement text was not changed | Module 05 | Decision recorded as the SRS requires; FR-PZ-07 stays a deferred P2 item |
+| DEC-16 | Puzzle input rules live in `util.Validators` (FR-LL-07): `parseYear`, `parseLibraryOrder`, `parseSequenceAnswer`, `parseFinalExitCode` plus `isValidXxx` shortcuts. Every input is trimmed; null and empty are invalid; ASCII digits only. Sequence answers allow an optional minus sign and at most 9 digits (no overflow), leading zeros are accepted (`030` is 30). The Library order is four comma-separated words (regex), case-insensitive, then checked for known and distinct books. In the Final Exit code the year and the library code are compared as text and the number as an integer | Module 05 | Implemented; assumptions where the SRS is silent (leading zeros, negative integers, case) |
+| DEC-17 | `GameCatalog.standardWithPuzzles()` is the only change to `GameCatalog`. The puzzle ids exist as constants in the puzzle classes and in `GameCatalog` (the `puzzles` package must not depend on `game`); tests keep them equal. `FinalExitPuzzle.REQUIRED_ITEM_IDS` likewise matches the catalog reward ids | Module 05 | Implemented; consistency covered by `GameCatalogTest` |
+| DEC-18 | The Library prompt lists the books in a scrambled order with their years, so the player has to sort them | Module 05 | Implemented (text only) |
 
 ## 4. Module 00 Revision History
 
@@ -61,6 +65,7 @@ This log records only facts that have actually happened or been reported by the 
 | 3 | Module 02 completion update (2026-11-22): §1, §2 note, §3 (DEC-07), §5, new §5a, §7 (Q-04, OI-03, OI-04), §7a, §8, §9 | Only the listed sections changed; all other content is unchanged |
 | 4 | Module 03 start update (2026-11-22): §3 (DEC-09 to DEC-11), §5, new §5b, §7 (OI-05), §7a, §8, §9 | Module 03 is recorded as in progress only; the Module 02 Git facts were updated from the student's report |
 | 5 | Module 04 completion update (2026-11-23): §3 (DEC-12 to DEC-14), §5 and §5b (Module 03 recorded as completed), new §5c, §7 (OI-05 to OI-07), §7a, §8, §9 | Module 04 is recorded as implemented with local verification pending for Part 4 only |
+| 6 | Module 05 update (2026-11-23): §3 (DEC-15 to DEC-18), §5, §5c (Module 04 recorded as completed), new §5d, §7a, §8, §9 | Module 05 is recorded as implemented with local verification pending |
 
 Corrections/omissions addressed in Rev 2 (per brief): socket leaderboard retained with queue/lock/multi-client requirements; database design with ER diagram and instructor-confirmation item; all 26 concepts and all 10 requirements traced; parser generator separated from regex; little language defined; group placeholders; no invented dates, names, results or approvals.
 
@@ -72,10 +77,11 @@ Corrections/omissions addressed in Rev 2 (per brief): socket leaderboard retaine
 | M01 Architecture and Design | Completed, committed and pushed (student-reported in the Module 03 brief). `docs/Architecture.md` and `docs/Design.md` exist. Commit hash not recorded here. |
 | M02 Maven Project Foundation | **Completed and verified by the student on 2026-11-22** (see §5a). Committed and pushed as `1210f63` (student-reported). |
 | M03 Domain Model and ADTs | **Completed** (see §5b). 64 tests passed locally; committed and pushed (student-reported). |
-| M04 Game Engine and Progression | **Implemented, Part 4 verification pending** (see §5c). Parts 1–3 verified locally (170 tests); Part 4 delivered, not yet run; not committed. |
-| M05–M13 | Not started (planned) |
+| M04 Game Engine and Progression | **Completed** (see §5c). 199 tests passed locally; committed and pushed as `c3740b9` (student-reported). |
+| M05 Puzzle System | **Implemented, local verification pending** (see §5d). Delivered with 104 new tests (expected total 303); not yet run; not committed. |
+| M06–M13 | Not started (planned) |
 
-Concept rows in `docs/Requirements-Traceability.md`: none `VERIFIED`. After Module 04, 16 concepts are `IN PROGRESS` (C-01, C-02, C-03, C-05, C-06, C-07, C-08, C-09, C-12, C-13, C-14, C-15, C-18, C-19, C-20, C-24) and 10 remain `PLANNED` (C-04, C-10, C-11, C-16, C-17, C-21, C-22, C-23, C-25, C-26).
+Concept rows in `docs/Requirements-Traceability.md`: none `VERIFIED`. After Module 05, 17 concepts are `IN PROGRESS` (C-01, C-02, C-03, C-05, C-06, C-07, C-08, C-09, C-12, C-13, C-14, C-15, C-17, C-18, C-19, C-20, C-24) and 9 remain `PLANNED` (C-04, C-10, C-11, C-16, C-21, C-22, C-23, C-25, C-26).
 
 ## 5a. Module 02 Completion Entry — 2026-11-22
 
@@ -124,7 +130,7 @@ Concept rows in `docs/Requirements-Traceability.md`: none `VERIFIED`. After Modu
 
 **Verification (student-reported):** `mvn clean test` ran 64 tests (59 Module 03 tests plus 5 Module 02 tests) with 0 failures, 0 errors and 0 skipped; `mvn clean package` succeeded; Module 03 was committed and pushed. The commit hash is not recorded here. `RoomId` order indexes 1 to 4 (DEC-10) match the Design and SRS data model; see OI-05 for the other assumptions.
 
-## 5c. Module 04 — Game Engine and Progression (IMPLEMENTED; Part 4 verification pending)
+## 5c. Module 04 — Game Engine and Progression (COMPLETED)
 
 **Objective:** Implement the game engine, the session, scoring, hints and room progression, with unit and integration tests, without Swing, real puzzles, timer, persistence, networking or ERL.
 
@@ -135,7 +141,7 @@ Concept rows in `docs/Requirements-Traceability.md`: none `VERIFIED`. After Modu
 | 1 | `SubmissionResult`, `HintResult`, `GameListener`, `UnlockContext`, `UnlockRule`, `ScoreCalculator`, `HintService` | 35 | 99 |
 | 2 | `Puzzle`, `PuzzleResult`, `HardCodedUnlockRule`, `GameCatalog`, `FakePuzzle` (test helper) | 31 | 130 |
 | 3 | `SessionSnapshot`, `GameSession` | 40 | 170 |
-| 4 | `GameEngine` | 29 | 199 expected, **not yet verified** |
+| 4 | `GameEngine` | 29 | 199 |
 
 **Implementation summary**
 - **GameSession and GameEngine:** `GameSession` owns the player, state, score, inventory, solved puzzles, unlocked rooms and revealed hints. `GameEngine` is the facade: it looks puzzles up in `GameCatalog` and delegates every operation to the session. It does not duplicate scoring, hint costs, progression, unlocking or state transitions (DEC-13).
@@ -148,14 +154,55 @@ Concept rows in `docs/Requirements-Traceability.md`: none `VERIFIED`. After Modu
 
 **Results**
 - Parts 1–3: `mvn clean test` passed with 99, 130 and 170 tests respectively, 0 failures, 0 errors, 0 skipped; `mvn clean package` BUILD SUCCESS and the JAR was generated (student-reported).
-- Part 4: delivered, **not yet run by the student**. No result is recorded.
+- Part 4: `mvn clean test` ran 199 tests with 0 failures, 0 errors and 0 skipped; `mvn clean package` BUILD SUCCESS (student-reported).
 
 **Remaining limitations and deferred work**
 - No timer: remaining seconds come from an injected `IntSupplier`; Module 07 supplies `GameTimer` and also stops it in restart and shutdown.
 - No real puzzles: Module 05. `GameCatalog.missingPuzzleIds()` lists puzzles not yet supplied.
 - The session's representation invariant includes "every unlocked room satisfies the unlock rule"; revisit it when ERL rules arrive in Module 10 (OI-06).
 - No code-review entry has been recorded for Module 04, no `Testing.md`, and no coverage figure has been measured.
-- Module 04 is **not committed**.
+- Module 04 was committed and pushed as `c3740b9 feat: implement core game engine` (student-reported).
+
+## 5d. Module 05 — Puzzle System (IMPLEMENTED; local verification pending)
+
+**Objective:** Replace the test-only puzzle doubles with the four real P1 puzzles, centralize puzzle input validation, and integrate them with the existing catalog, session and engine, without changing the Module 04 logic.
+
+**Implementation summary**
+- **Four puzzles** (all in `puzzles`, all implementing the existing `Puzzle` and returning the existing `PuzzleResult`):
+  - `OfficePuzzle` (`office_year`, OFFICE): the year `2004` is CORRECT, any other four-digit year INCORRECT, anything else INVALID_FORMAT.
+  - `LibraryPuzzle` (`library_order`, LIBRARY): `RED,GREEN,BLUE,YELLOW` is CORRECT; the other 23 orders INCORRECT; missing, duplicate, unknown or extra books INVALID_FORMAT; spaces and case are ignored.
+  - `SequencePuzzle` (`lab_sequence`, LABORATORY): `30` is CORRECT, other integers INCORRECT; non-integers and numbers over 9 digits INVALID_FORMAT.
+  - `FinalExitPuzzle` (`final_exit`, FINAL_EXIT): `2004-7394-30` is CORRECT; a well-formed wrong code is INCORRECT and the feedback says only how many of the 3 components are right (never which); it declares the required items `office_key`, `code_7394` and `lab_clue_30`.
+- **Puzzle contract:** each puzzle is a final class with only static final constants (no instance state), so `submit` is pure and total: it never throws for player input, never touches the session, the inventory or the score, and returns the same result for the same input. Rewards, penalties, missing-clue checks and victory remain in `GameSession`.
+- **Validation:** `Validators` now holds all regular expressions (FR-LL-07) and the parse methods listed in DEC-16.
+- **Progressive hints:** every puzzle returns exactly three distinct, non-blank, unmodifiable hints; hint cost, limit and state are unchanged (`HintService`, `GameSession`).
+- **Catalog integration:** `GameCatalog.standardWithPuzzles()` builds the standard rooms and reward items with the four real puzzles; it has no missing puzzles. The Laboratory requires `lab_sequence` alone.
+- **Rooms, rewards and progression:** unchanged `HardCodedUnlockRule`; the reward items `office_key`, `code_7394`, `lab_clue_30` are still granted by the session when a room is completed.
+- **Resubmission and penalties:** unchanged session behavior is now tested with the real puzzles: `ALREADY_SOLVED` without penalty or second reward; INVALID_FORMAT free; INCORRECT costs 25 with a floor at 0.
+- **Not changed:** `pom.xml`, `GameSession`, `GameEngine`, `SessionSnapshot`, `Puzzle`, `PuzzleResult`, `ScoreCalculator`, `HintService`, `HardCodedUnlockRule`, and every existing test (two existing test files had tests appended).
+
+**Tests (delivered, not yet run by the student)**
+
+| Test class | New tests |
+|---|---|
+| `OfficePuzzleTest` | 11 |
+| `LibraryPuzzleTest` | 14 |
+| `SequencePuzzleTest` | 12 |
+| `FinalExitPuzzleTest` | 17 |
+| `PuzzleContractTest` | 13 |
+| `ResubmitTest` | 7 |
+| `PenaltyRulesTest` | 11 |
+| `ValidatorsTest` (appended) | 12 |
+| `GameCatalogTest` (appended) | 7 |
+| **Total new** | **104** |
+
+Expected total after Module 05: 199 + 104 = **303**. This has **not been run locally**, so no Module 05 test or package result is recorded.
+
+**Deferred and open**
+- **SymbolPuzzle (FR-PZ-07, P2)** is deferred (DEC-15); this is the decision the SRS asks to record in Module 05.
+- Assumptions where the SRS is silent (DEC-16): leading zeros (`030`), negative integers, letter case and surrounding spaces are accepted as described there.
+- No code-review entry and no `Testing.md` exist yet for Module 05; no coverage figure was measured.
+- The UI, timer, networking, persistence and ERL are not part of this module.
 
 ## 6. Debugging Log
 
@@ -208,15 +255,18 @@ Student-reported results from Module 02 (2026-11-22):
 | Part 1 | 99 | 0 / 0 / 0 | BUILD SUCCESS |
 | Part 2 | 130 | 0 / 0 / 0 | BUILD SUCCESS |
 | Part 3 | 170 | 0 / 0 / 0 | BUILD SUCCESS |
+| Part 4 | 199 | 0 / 0 / 0 | BUILD SUCCESS |
 
-Part 4 adds 29 `GameEngineTest` tests; the expected total is 199. This has **not been run locally**, so no Part 4 result is recorded.
+**Part 4 (student-reported):** 199 tests, 0 failures, 0 errors, 0 skipped; `mvn clean package` BUILD SUCCESS.
+
+**Module 05:** 104 new tests were delivered (expected total 303). The student has **not yet run them**, so no Module 05 result is recorded.
 
 ## 8. Git Status
 
 - Branch `main`, remote `origin` → `https://github.com/MuhammadJoyo/Escape-Protocol.git`.
-- **Module 00, 01, 02 and 03:** committed and pushed (student-reported). Module 02 commit: `1210f63`. Other hashes are not recorded here.
-- **Module 04:** Parts 1–3 are in the student's working tree and verified locally (170 tests); Part 4 is delivered and not yet verified. Nothing from Module 04 is recorded as committed or pushed.
-- Planned commit message after Part 4 passes: `feat: implement core game engine`.
+- **Module 00 to Module 04:** committed and pushed (student-reported). Module 02 commit: `1210f63`. Module 04 commit: `c3740b9 feat: implement core game engine`. Other hashes are not recorded here.
+- **Module 05:** delivered, not yet verified locally, and **not committed or pushed**.
+- Planned commit message after Module 05 passes: `feat: implement puzzle system`.
 
 ## 9. Log Entries
 
@@ -231,3 +281,5 @@ Part 4 adds 29 `GameEngineTest` tests; the expected total is 199. This has **not
 | 2026-11-22 | Module 03 completed: 64 tests passed locally, committed and pushed (student-reported) |
 | 2026-11-23 | Module 04 decisions D1–D8 approved; Parts 1–3 delivered and verified locally by the student (99, 130 and 170 tests, all passing) |
 | 2026-11-23 | Module 04 Part 4 (`GameEngine`, `GameEngineTest`, documentation updates) delivered; local verification pending; not committed |
+| 2026-11-23 | Module 04 completed: 199 tests passed, `mvn clean package` BUILD SUCCESS, committed and pushed as `c3740b9` (student-reported) |
+| 2026-11-23 | Module 05 (puzzle system) delivered in one archive: four puzzles, `Validators` extension, `GameCatalog.standardWithPuzzles()`, 104 new tests; local verification pending; not committed. SymbolPuzzle deferred (DEC-15) |
